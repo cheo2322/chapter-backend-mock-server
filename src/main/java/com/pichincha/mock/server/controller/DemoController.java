@@ -17,5 +17,4 @@ public class DemoController {
   public void getTransactions() {
     this.service.getTransactions();
   }
-
 }
