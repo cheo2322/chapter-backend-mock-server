@@ -1,10 +1,11 @@
 package com.pichincha.mock.server.webclient;
 
+import com.pichincha.mock.server.dto.Transaction;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 import reactor.netty.http.client.HttpClient;
 
 @Component
@@ -25,9 +26,9 @@ public class DemoWebClient {
         .uri(uriBuilder -> uriBuilder.path("/v3/76cedf38-7f06-43ad-b618-7293dc9b0926").build());
   }
 
-  public Mono<Void> getTransactions() {
+  public Flux<Transaction> getTransactions() {
     return setupWebclient()
         .retrieve()
-        .bodyToMono(Void.class);
+        .bodyToFlux(Transaction.class);
   }
 }
