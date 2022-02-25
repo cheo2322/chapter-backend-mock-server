@@ -1,0 +1,60 @@
+[
+  {
+    "transactionId": "1",
+    "description": "TRANSFERENCIA DIRECTA",
+    "longDescription": "TRANSFERENCIA DIRECTA",
+    "amount": 100.00,
+    "currency": {
+      "code": "USD",
+      "description": "DOLARES AMERICANOS"
+    },
+    "operationDate": "2021-10-01",
+    "type": {
+      "code": "D",
+      "description": "DEBITO"
+    },
+    "channel": {
+      "type": {
+        "code": "O",
+        "description": "OFICINA"
+      },
+      "name": "Agencia 1"
+    },
+    "account": {
+      "availableAmount": 100.00,
+      "currency": {
+        "code": "USD",
+        "description": "DOLARES AMERICANOS"
+      }
+    }
+  },
+  {
+    "transactionId": "2",
+    "description": "TRANSFERENCIA DIRECTA EMPRESA2",
+    "longDescription": "TRANSFERENCIA DIRECTA EMPRESA2",
+    "amount": 200.00,
+    "currency": {
+      "code": "USD",
+      "description": "DOLARES AMERICANOS"
+    },
+    "operationDate": "2021-10-01",
+    "type": {
+      "code": "D",
+      "description": "DEBITO"
+    },
+    "channel": {
+      "type": {
+        "code": "O",
+        "description": "OFICINA"
+      },
+      "name": "Agencia 2"
+    },
+    "account": {
+      "availableAmount": 200.00,
+      "currency": {
+        "code": "USD",
+        "description": "DOLARES AMERICANOS"
+      }
+    }
+  }
+]
