@@ -1,6 +1,7 @@
 package com.pichincha.mock.server.webclient;
 
 import com.pichincha.mock.server.dto.Transaction;
+import com.pichincha.mock.server.properties.DemoProperties;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,9 +14,13 @@ public class DemoWebClient {
 
   private final WebClient webClient;
 
-  protected DemoWebClient() {
+  private final DemoProperties demoProperties;
+
+  protected DemoWebClient(DemoProperties demoProperties) {
+    this.demoProperties = demoProperties;
+
     this.webClient = WebClient.builder()
-        .baseUrl("https://run.mocky.io")
+        .baseUrl(this.demoProperties.getBaseUrl())
         .clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().compress(true)))
         .build();
   }
