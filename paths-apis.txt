@@ -1,0 +1,5 @@
+Obtener transaccion por ID
+http://localhost:8080/api/default/transactions/1d42986f-a6d0-40c2-a807-bd4b2ec8472f
+
+Obtener todas las transacciones
+http://localhost:8080/api/default/transactions
