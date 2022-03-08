@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pichincha.mock.server.dto.Transaction;
 import com.pichincha.mock.server.properties.DemoProperties;
 import io.swagger.models.HttpMethod;
+
+import java.lang.reflect.Array;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +23,7 @@ import org.springframework.http.HttpStatus;
 class DemoWebClientTest {
 
   private ClientAndServer mockServer;
-  private DemoWebClient demoWebClient;
+  //private DemoWebClient demoWebClient;
   private static final ObjectMapper serializer = new ObjectMapper();
 
   @BeforeEach
@@ -30,7 +32,7 @@ class DemoWebClientTest {
 
     DemoProperties demoProperties = new DemoProperties();
     demoProperties.setBaseUrl("http://localhost:" + mockServer.getLocalPort());
-    demoWebClient = new DemoWebClient(demoProperties);
+    //demoWebClient = new DemoWebClient(demoProperties);
   }
 
   @AfterEach
@@ -54,7 +56,7 @@ class DemoWebClientTest {
             .withBody(stringResponse)
     );
 
-    List<Transaction> responses = demoWebClient.getTransactions().collectList().block();
+    List<Transaction> responses = null;//demoWebClient.getTransactions().collectList().block();
 
     assertNotNull(responses);
     assertEquals(1, responses.size());

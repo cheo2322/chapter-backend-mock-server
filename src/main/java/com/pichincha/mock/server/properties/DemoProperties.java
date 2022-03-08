@@ -1,15 +1,15 @@
 package com.pichincha.mock.server.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Getter
-@Setter
+@Data
 @Component
 @ConfigurationProperties("bs.account")
 public class DemoProperties {
 
-  private String baseUrl;
+    @Value("${mock.server.baseUrl}")
+    private String baseUrl;
 }

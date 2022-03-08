@@ -24,7 +24,8 @@ public class DemoController {
 
     @GetMapping("/transactions/{id}")
     public ResponseEntity<Transaction> getTransactionById(@PathVariable String id) {
-        return ResponseEntity.ok().body(this.service.getTransactionById(id).get());
+        Transaction result = this.service.getTransactionById().get();
+        result.setTransactionId(id);
+        return ResponseEntity.ok().body(result);
     }
-
 }
