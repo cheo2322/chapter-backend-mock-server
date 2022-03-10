@@ -1,49 +1,37 @@
 package com.pichincha.mock.server.service;
 
 import com.pichincha.mock.server.dto.Transaction;
-import com.pichincha.mock.server.properties.DemoProperties;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Optional;
 
-@Log4j2
 @Service
-public class DemoService {
+public class TransactionService {
 
     private final WebClient webClient;
 
-    public DemoService(DemoProperties demoProperties) {
+    private int PORT = 8000;
 
+    public TransactionService() {
         this.webClient = WebClient.builder()
-                .baseUrl(demoProperties.getBaseUrl())
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().compress(true)))
+                .baseUrl("http://localhost:" + PORT)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultUriVariables(Collections.singletonMap("url", "http://localhost:" + PORT))
                 .build();
     }
 
-    public Flux<Transaction> getTransactions() {
-        return this.webClient
-                .get()
-                .uri(uriBuilder -> uriBuilder.path("/v3/76cedf38-7f06-43ad-b618-7293dc9b0926").build())
-                .retrieve()
-                .bodyToFlux(Transaction.class);
-    }
-
-    public Optional<Transaction> getTransactionById() {
+    public Optional<Transaction> getTransaction(String id) {
         Mono<Transaction> products = webClient.get()
-                .uri("v3/1d42986f-a6d0-40c2-a807-bd4b2ec8472f")
+                .uri("/api/transactions/" + id)
                 .retrieve()
                 .onStatus(HttpStatus.NOT_FOUND::equals, clientResponse -> Mono.empty())
                 .bodyToMono(Transaction.class)
@@ -53,5 +41,13 @@ public class DemoService {
                 );
 
         return products.blockOptional(Duration.ofSeconds(30));
+    }
+
+    public Flux<Transaction> getTransactions() {
+        return this.webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/api/transactions").build())
+                .retrieve()
+                .bodyToFlux(Transaction.class);
     }
 }
