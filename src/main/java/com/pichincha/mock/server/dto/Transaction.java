@@ -23,7 +23,6 @@ public class Transaction {
     private TransactionChannel channel;
     private Account account;
 
-
     @Data
     @Builder
     @AllArgsConstructor
