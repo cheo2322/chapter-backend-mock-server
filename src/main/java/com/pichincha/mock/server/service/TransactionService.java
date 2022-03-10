@@ -27,14 +27,26 @@ public class TransactionService {
                 .build();
     }
 
+    public Transaction addTransaction(Transaction data) {
+        Mono<Transaction> response = webClient.post()
+                .uri("/api/transactions")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(data), Transaction.class)
+                .retrieve()
+                .onStatus(HttpStatus.NOT_FOUND::equals, clientResponse -> Mono.empty())
+                .bodyToMono(Transaction.class);
+
+        return response.blockOptional().get();
+    }
+
     public Optional<Transaction> getTransaction(String id) {
-        Mono<Transaction> products = webClient.get()
+        Mono<Transaction> response = webClient.get()
                 .uri("/api/transactions/" + id)
                 .retrieve()
                 .onStatus(HttpStatus.NOT_FOUND::equals, clientResponse -> Mono.empty())
                 .bodyToMono(Transaction.class);
 
-        return products.blockOptional();
+        return response.blockOptional();
     }
 
     public Flux<Transaction> getAllTransactions() {
@@ -43,5 +55,15 @@ public class TransactionService {
                 .uri(uriBuilder -> uriBuilder.path("/api/transactions").build())
                 .retrieve()
                 .bodyToFlux(Transaction.class);
+    }
+
+    public String deleteTransaction(String id) {
+        Mono<String> response = webClient.delete()
+                .uri("/api/transactions/" + id)
+                .retrieve()
+                .onStatus(HttpStatus.NOT_FOUND::equals, clientResponse -> Mono.empty())
+                .bodyToMono(String.class);
+
+        return response.blockOptional().get();
     }
 }

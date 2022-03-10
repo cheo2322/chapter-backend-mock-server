@@ -9,9 +9,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
-import org.mockserver.model.MediaType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.testng.Assert;
 import reactor.core.publisher.Flux;
 
@@ -39,23 +39,49 @@ class TransactionServiceTest {
     }
 
     @AfterEach
-    public void tearDownServer() {
+    public void stop() {
         mockServer.stop();
     }
 
     @Test
+    void addTransactionTest() throws JsonProcessingException {
+
+        Transaction newTransaction = createTransactionObjectToPut(null);
+
+        mockServer.when(
+                request()
+                        .withMethod(HttpMethod.POST.name())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withPath("/api/transactions")
+                        .withBody(objectMapper.writeValueAsString(newTransaction))
+        ).respond(
+                response()
+                        .withStatusCode(HttpStatus.OK.value())
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(objectMapper.writeValueAsString(createTransactionObjectToPut("1")))
+        );
+
+        Transaction response = demoWebClient.addTransaction(newTransaction);
+
+        assertNotNull(response);
+
+        Assert.assertEquals(response.getTransactionId(), "1");
+    }
+
+    @Test
     void getTransactionTest() throws JsonProcessingException {
+
         String id = "1";
 
         mockServer.when(
                 request()
                         .withMethod(HttpMethod.GET.name())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withPath("/api/transactions/" + id)
         ).respond(
                 response()
                         .withStatusCode(HttpStatus.OK.value())
-                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withBody(objectMapper.writeValueAsString(createTransactionObjectToPut(id)))
         );
 
@@ -72,17 +98,19 @@ class TransactionServiceTest {
     @Test
     void getAllTransactionsTest() throws JsonProcessingException {
 
-        List<Transaction> transactionList = createTransactionListObjectToPut();
+        int numberTransactions = 2;
+
+        List<Transaction> transactionList = createTransactionListObjectToPut(numberTransactions);
 
         mockServer.when(
                 request()
                         .withMethod(HttpMethod.GET.name())
-                        .withHeader(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .withPath("/api/transactions")
         ).respond(
                 response()
                         .withStatusCode(HttpStatus.OK.value())
-                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
                         .withBody(objectMapper.writeValueAsString(transactionList))
         );
 
@@ -90,22 +118,48 @@ class TransactionServiceTest {
 
         assertNotNull(response);
 
-        Assert.assertTrue(response.count().block() > 0);
+        Assert.assertTrue(response.count().block() == numberTransactions);
+
         Assert.assertEquals(response.blockFirst().getCurrency().getCode(), "USD");
     }
 
-    public List<Transaction> createTransactionListObjectToPut() {
-        List<Transaction> list = new ArrayList<>();
-        Transaction t1 = createTransactionObjectToPut("1");
-        Transaction t2 = createTransactionObjectToPut("2");
+    @Test
+    void deleteTransactionTest() {
 
-        list.add(t1);
-        list.add(t2);
+        String id = "1";
+
+        mockServer.when(
+                request()
+                        .withMethod(HttpMethod.DELETE.name())
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withPath("/api/transactions/" + id)
+        ).respond(
+                response()
+                        .withStatusCode(HttpStatus.OK.value())
+                        .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
+                        .withBody(id)
+        );
+
+        String response = demoWebClient.deleteTransaction(id);
+
+        assertNotNull(response);
+
+        Assert.assertEquals(response, id);
+    }
+
+    public List<Transaction> createTransactionListObjectToPut(int numberTransactions) {
+
+        List<Transaction> list = new ArrayList<>();
+
+        for (int i = 1; i <= numberTransactions; i++) {
+            list.add(createTransactionObjectToPut(String.valueOf(i)));
+        }
 
         return list;
     }
 
     public Transaction createTransactionObjectToPut(String id) {
+
         Transaction transaction = new Transaction();
         transaction.setTransactionId(id);
         transaction.setDescription("TRANSFERENCIA DIRECTA");
