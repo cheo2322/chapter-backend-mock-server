@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,18 +25,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
+@SpringBootTest
 class TransactionServiceTest {
 
     private ClientAndServer mockServer;
-    private TransactionService demoWebClient;
+    private TransactionService transactionService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private final int PORT = 9000;
 
     @BeforeEach
     public void setupMockServer() {
-        mockServer = ClientAndServer.startClientAndServer(PORT);
-        demoWebClient = new TransactionService();
+        mockServer = ClientAndServer.startClientAndServer(9000);
+        transactionService = new TransactionService();
     }
 
     @AfterEach
@@ -61,7 +61,7 @@ class TransactionServiceTest {
                         .withBody(objectMapper.writeValueAsString(createTransactionObjectToPut("1")))
         );
 
-        Transaction response = demoWebClient.addTransaction(newTransaction);
+        Transaction response = transactionService.addTransaction(newTransaction);
 
         assertNotNull(response);
 
@@ -85,7 +85,7 @@ class TransactionServiceTest {
                         .withBody(objectMapper.writeValueAsString(createTransactionObjectToPut(id)))
         );
 
-        Optional<Transaction> response = demoWebClient.getTransaction(id);
+        Optional<Transaction> response = transactionService.getTransaction(id);
 
         assertNotNull(response.get());
 
@@ -114,7 +114,7 @@ class TransactionServiceTest {
                         .withBody(objectMapper.writeValueAsString(transactionList))
         );
 
-        Flux<Transaction> response = demoWebClient.getAllTransactions();
+        Flux<Transaction> response = transactionService.getAllTransactions();
 
         assertNotNull(response);
 
@@ -140,7 +140,7 @@ class TransactionServiceTest {
                         .withBody(id)
         );
 
-        String response = demoWebClient.deleteTransaction(id);
+        String response = transactionService.deleteTransaction(id);
 
         assertNotNull(response);
 
